@@ -48,7 +48,8 @@ jobs:
           pip install bandit semgrep
       
       - name: Run Bandit
-        run: bandit -r . -c .bandit -f custom --msg-template "{abspath}:{line}: {test_id}: {severity}: {msg}"
+        run: |
+          bandit -r . -c .bandit -f custom --msg-template "{abspath}:{line}: {test_id}: {severity}: {msg}"
       
       - name: Run Semgrep
         run: semgrep scan --config p/python --metrics=off .
