@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template, request, jsonify
 from models import init_db, get_notes, get_note, create_note, update_note, delete_note
 
@@ -64,4 +65,6 @@ def remove_note(note_id):
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    # Debug только для локальной разработки, в продакшене выключен
+    is_debug = os.environ.get("FLASK_DEBUG", "0") == "1"
+    app.run(debug=is_debug, host="127.0.0.1", port=5000)

@@ -27,3 +27,16 @@ docker run -d -p 5000:5000 --name notepad web-notepad
 
 # Остановка
 docker stop notepad && docker rm notepad
+
+## 🔒 Безопасность
+
+### Статический анализ
+```bash
+# Проверка кода на уязвимости
+bandit -r . -f custom
+
+# Проверка зависимостей
+safety check
+
+# Расширенный анализ
+semgrep --config auto .
