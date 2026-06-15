@@ -34,7 +34,7 @@ jobs:
         run: |
           black --check .
 
-    security-scan:
+  security-scan:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -56,9 +56,9 @@ jobs:
         run: |
           bandit -r . -c .bandit -f custom --msg-template "{abspath}:{line}: {test_id}: {severity}: {msg}"
       
-      - name: Run Semgrep (не блокирует сборку)
+      - name: Run Semgrep
         run: |
-          semgrep --config p/python --quiet --disable-version-check .
+          semgrep scan --config p/python --metrics=off .
         env:
           SEMGREP_SEND_METRICS: off
         continue-on-error: true
