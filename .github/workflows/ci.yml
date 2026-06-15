@@ -49,7 +49,7 @@ jobs:
       
       - name: Run Bandit
         run: |
-          bandit -r . -c .bandit -f custom --msg-template "{abspath}:{line}: {test_id}: {severity}: {msg}"
+          bandit -r . --exclude tests,venv,.venv,scripts --skip B101,B311 -f custom --msg-template "{abspath}:{line}: {test_id}: {severity}: {msg}"
       
       - name: Run Semgrep
         run: semgrep scan --config p/python --metrics=off .
