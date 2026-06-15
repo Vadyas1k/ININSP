@@ -100,7 +100,8 @@ jobs:
           pip install pip-audit
       
       - name: Generate SBOM
-        run: python scripts/gen_sbom.py
+        run: |
+          pip list --format json > sbom.json
       
       - name: Audit dependencies
         run: |
