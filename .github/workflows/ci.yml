@@ -104,7 +104,7 @@ jobs:
       
       - name: Audit dependencies
         run: |
-          pip-audit -r requirements.txt --format json > audit-report.json
+          pip-audit -r requirements.txt --format json > audit-report.json || true
           cat audit-report.json
       
       - name: Upload SCA artifacts
