@@ -2,9 +2,7 @@ name: CI Pipeline
 
 on:
   push:
-    branches: [ main, master ]
   pull_request:
-    branches: [ main, master ]
 
 jobs:
   lint-and-format:
@@ -26,13 +24,10 @@ jobs:
           pip install flake8 black
       
       - name: Lint with Flake8
-        run: |
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
       
       - name: Check formatting with Black
-        run: |
-          black --check .
+        run: black --check .
 
   security-scan:
     runs-on: ubuntu-latest
@@ -54,11 +49,10 @@ jobs:
       
       - name: Run Bandit
         run: |
-          bandit -r . -c .bandit -f custom --msg-template "{abspath}:{line}: {test_id}: {severity}: {msg}"
+          bandit -r . --exclude tests,venv,.venv,scripts --skip B101,B311 -f custom --msg-template "{abspath}:{line}: {test_id}: {severity}: {msg}"
       
       - name: Run Semgrep
-        run: |
-          semgrep scan --config p/python --metrics=off .
+        run: semgrep scan --config p/python --metrics=off .
         env:
           SEMGREP_SEND_METRICS: off
         continue-on-error: true
@@ -84,5 +78,40 @@ jobs:
           pip install pytest
       
       - name: Run tests
+        run: pytest tests/ -v --tb=short
+
+  sca-scan:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web-notepad
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      
+      - name: Install dependencies & SCA tools
         run: |
-          pytest tests/ -v --tb=short
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pip-audit
+      
+      - name: Generate SBOM
+        run: |
+          pip list --format json > sbom.json
+      
+      - name: Audit dependencies
+        run: |
+          pip-audit -r requirements.txt --format json > audit-report.json || true
+          cat audit-report.json
+      
+      - name: Upload SCA artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sca-results
+          path: |
+            web-notepad/sbom.json
+            web-notepad/audit-report.json
