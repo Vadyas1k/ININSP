@@ -1,20 +1,18 @@
-#!/usr/bin/env python3
-"""Простая генерация SBOM без внешних зависимостей"""
 import json
-import subprocess
-from datetime import datetime
+import subprocess  # nosec B404
 import sys
+from datetime import datetime
 
 
 def generate_simple_sbom():
-    # nosec B404,B603,B607 — используется sys.executable, команда жёстко задана, ввод не обрабатывается
+    # nosec B603: Hardcoded arguments, safe execution
     res = subprocess.run(
         [sys.executable, "-m", "pip", "list", "--format", "json"],
         capture_output=True,
         text=True,
         check=True,
     )
-    packages = json.loads(res.stdout)
+    pkgs = json.loads(res.stdout)
 
     sbom = {
         "bomFormat": "CycloneDX",
@@ -27,18 +25,17 @@ def generate_simple_sbom():
         "components": [
             {
                 "type": "library",
-                "name": pkg["name"],
-                "version": pkg["version"],
-                "purl": f"pkg:pypi/{pkg['name']}@{pkg['version']}",
+                "name": p["name"],
+                "version": p["version"],
+                "purl": f"pkg:pypi/{p['name']}@{p['version']}",
             }
-            for pkg in packages
+            for p in pkgs
         ],
     }
 
     with open("sbom.json", "w", encoding="utf-8") as f:
         json.dump(sbom, f, indent=2, ensure_ascii=False)
-
-    print(f"✅ SBOM создан: sbom.json ({len(packages)} пакетов)")
+    print(f"✅ SBOM created: {len(pkgs)} packages")
 
 
 if __name__ == "__main__":
