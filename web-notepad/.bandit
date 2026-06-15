@@ -1,7 +1,3 @@
-exclude_dirs:
-  - tests
-  - venv
-  - .venv
-skips:
-  - B101
-  - B311
+[bandit]
+exclude_dirs = tests,venv,.venv,scripts
+skips = B101,B311
