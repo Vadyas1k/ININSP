@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template, request, jsonify
 from models import init_db, get_notes, get_note, create_note, update_note, delete_note
 
